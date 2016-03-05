@@ -2,9 +2,9 @@
 
 ADC *adc = new ADC(); // adc object;
 
-const uint8_t ledPin1 = 27;
-const uint8_t ledPin2 = 28;
-const uint8_t ledPin3 = 29;
+const uint8_t ledPin1 = 27; // GR
+const uint8_t ledPin2 = 28; // BL
+const uint8_t ledPin3 = 29; // RD
 const uint8_t VbatPin = A1;
 
 uint16_t VBAT;
@@ -34,10 +34,10 @@ void setup()
 
 void showColor( int16_t sCol )
 {
-    // sCol == enum ColorND { white, purple, orange, red, teal, blue, green, black };
-    digitalWrite(ledRGB[ 0 ], (sCol & 1));  // Given sCol these three lines make enumerated color for function
-    digitalWrite(ledRGB[ 1 ], (sCol & 2));
-    digitalWrite(ledRGB[ 2 ], (sCol & 4));
+  // sCol == enum ColorND { white, purple, orange, red, teal, blue, green, black };
+  digitalWrite(ledRGB[ 0 ], (sCol & 1));  // Given sCol these three lines make enumerated color for function
+  digitalWrite(ledRGB[ 1 ], (sCol & 2));
+  digitalWrite(ledRGB[ 2 ], (sCol & 4));
 }
 
 elapsedMillis busyTime;
@@ -49,11 +49,11 @@ void loop()
   if ( busyTime > busyWait ) {
     if ( ii >= 8 ) ii = 0;
     busyTime = 0;
-    digitalWrite(ledRGB[ 0 ], (ii & 1));  // Given ii these three lines make enumerated color for function
-    digitalWrite(ledRGB[ 1 ], (ii & 2));
-    digitalWrite(ledRGB[ 2 ], (ii & 4));
-    ii++;
-    if ( 8 == ii ) for ( int jj=1; jj<7; jj++ ) { delay(100); showColor(jj); }
+    showColor(ii++);
+    if ( 8 == ii ) for ( int jj = 1; jj < 7; jj++ ) {
+        delay(100);
+        showColor(jj);
+      }
   }
 
   if ( TimeADC > 100 ) {
