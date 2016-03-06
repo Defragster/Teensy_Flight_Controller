@@ -10,11 +10,13 @@ const uint8_t VbatPin = A1;
 uint16_t VBAT;
 uint16_t arrVBAT[8];
 uint16_t iiVBAT = 0;
+uint16_t arrVBAT2[100]; // Store values for recall across USB drop
+uint16_t iiVBAT2 = 0;
 uint8_t ledRGB[3] = { ledPin1, ledPin2, ledPin3};
 
 enum ColorND { white, purple, orange, red, teal, blue, green, black };
 void showColor( int16_t sCol )
-{  // sCol == enum ColorND
+{ // sCol == enum ColorND
   digitalWrite(ledRGB[ 0 ], (sCol & 1));  // Given sCol these three lines make enumerated color for function
   digitalWrite(ledRGB[ 1 ], (sCol & 2));
   digitalWrite(ledRGB[ 2 ], (sCol & 4));
@@ -65,13 +67,22 @@ void loop()
     if ( 0 != arrVBAT[ iiVBAT ] ) iiVBAT++;
     if (iiVBAT >= 8) {
       VBAT = 0;
-      for ( int jj = 0; jj < 8; jj++ ) {
-        VBAT += arrVBAT[jj];
-      }
+      for ( int jj = 0; jj < 8; jj++ ) VBAT += arrVBAT[jj];
       VBAT /= 4;  // 8 Samples - remove 2.* factor below
       Serial.print("VBAT = "); Serial.print(VBAT * 3.3 / adc->getMaxValue(ADC_0), 3); Serial.println(" V");
       iiVBAT = 0;
+      if ( iiVBAT2 < 100 ) arrVBAT2[iiVBAT2++] = VBAT;
     }
+  }
+}
+
+
+int incomingByte;
+void serialEvent() { //
+  while (Serial.available()) {
+    incomingByte = Serial.read();
+    while ( iiVBAT2 > 0 ) Serial.println( arrVBAT2[--iiVBAT2] * 3.3 / adc->getMaxValue(ADC_0), 3);
+    Serial.write( (char)incomingByte );
   }
 }
 
